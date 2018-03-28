@@ -43,6 +43,12 @@
         </dependency>
 
         <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>24.1-jre</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
             <version>2.15.0</version>
@@ -99,7 +105,7 @@
                             SchedulerLauncher has hard dependencies on AWS. Not testable. All the interesting logic is
                             in BridgeMasterScheduler anyway.
                         -->
-                        <exclude>org/sagebionetworks/bridge/fitbit/scheduler/SchedulerLauncher.class</exclude>
+                        <exclude>org/sagebionetworks/bridge/scheduler/SchedulerLauncher.class</exclude>
                     </excludes>
                     <rules>
                         <rule>

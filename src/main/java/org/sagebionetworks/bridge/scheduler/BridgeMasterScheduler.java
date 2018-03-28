@@ -18,14 +18,14 @@ public class BridgeMasterScheduler {
     // To prevent infinite loops, specify a max number of scheduled executions per scheduler run. (60 per hour.)
     private static final int MAX_EXECUTIONS = 60;
 
-    // Config keys
-    private static final String CONFIG_KEY_CRON_SCHEDULE = "cronSchedule";
-    private static final String CONFIG_KEY_HASH_KEY = "hashKey";
-    private static final String CONFIG_KEY_LAST_PROCESSED_TIME = "lastProcessedTime";
-    private static final String CONFIG_KEY_REQUEST_TEMPLATE = "requestTemplate";
-    private static final String CONFIG_KEY_SCHEDULE_ID = "scheduleId";
-    private static final String CONFIG_KEY_QUEUE_URL = "sqsQueueUrl";
-    private static final String HASH_KEY_MASTER_SCHEDULER = "BridgeMasterScheduler";
+    // Config keys - Package scoped for unit tests.
+    static final String CONFIG_KEY_CRON_SCHEDULE = "cronSchedule";
+    static final String CONFIG_KEY_HASH_KEY = "hashKey";
+    static final String CONFIG_KEY_LAST_PROCESSED_TIME = "lastProcessedTime";
+    static final String CONFIG_KEY_REQUEST_TEMPLATE = "requestTemplate";
+    static final String CONFIG_KEY_SCHEDULE_ID = "scheduleId";
+    static final String CONFIG_KEY_QUEUE_URL = "sqsQueueUrl";
+    static final String HASH_KEY_MASTER_SCHEDULER = "BridgeMasterScheduler";
 
     private Table ddbConfigTable;
     private Table ddbStatusTable;
@@ -39,7 +39,7 @@ public class BridgeMasterScheduler {
         this.ddbConfigTable = ddbConfigTable;
     }
 
-    // todo doc
+    /** DDB table for scheduler status. Tracks the last time the scheduler ran. */
     public final void setDdbStatusTable(Table ddbStatusTable) {
         this.ddbStatusTable = ddbStatusTable;
     }
@@ -78,26 +78,26 @@ public class BridgeMasterScheduler {
         Iterable<Item> configIter = scanDdbTable(ddbConfigTable);
         for (Item oneConfig : configIter) {
             try {
-                // todo wrap in try catch finally
                 List<DateTime> processTimeList = getProcessingTimes(oneConfig, lastProcessedTimeUtc, nowUtc);
                 for (DateTime oneProcessTime : processTimeList) {
                     process(oneConfig, oneProcessTime);
                 }
-            } catch (IOException ex) {
-                // todo
+            } catch (Exception ex) {
+                // Write error to stderr. Lambda takes care of saving these to the logs.
                 ex.printStackTrace();
             }
         }
 
         // Update last processed time in the status table.
         ddbStatusTable.putItem(new Item().withString(CONFIG_KEY_HASH_KEY, HASH_KEY_MASTER_SCHEDULER)
-                .withLong(CONFIG_KEY_LAST_PROCESSED_TIME, lastProcessedTimeUtc.getMillis()));
+                .withLong(CONFIG_KEY_LAST_PROCESSED_TIME, nowUtc.getMillis()));
     }
 
+    // Helper method to get the process times for the given schedule and bounds. Start time is exclusive. End time is
+    // inclusive.
     private List<DateTime> getProcessingTimes(Item scheduleConfig, DateTime startTimeUtc, DateTime endTimeUtc) {
         String scheduleId = scheduleConfig.getString(CONFIG_KEY_SCHEDULE_ID);
 
-        // todo test to see if this is inclusive or exclusive, and adjust the code accordingly
         // Use quartz to parse and fire cron triggers.
         String cronSchedule = scheduleConfig.getString(CONFIG_KEY_CRON_SCHEDULE);
         MutableTrigger mutableTrigger = CronScheduleBuilder.cronSchedule(cronSchedule)
@@ -112,7 +112,6 @@ public class BridgeMasterScheduler {
         while ((lastProcessDate = mutableTrigger.getFireTimeAfter(lastProcessDate)) != null) {
             numExecutions++;
             if (numExecutions > MAX_EXECUTIONS) {
-                // todo different exception type?
                 throw new IllegalArgumentException("Max executions exceeded for schedule " + scheduleId);
             }
 
@@ -122,6 +121,7 @@ public class BridgeMasterScheduler {
         return processTimeList;
     }
 
+    // Helper method to process a single schedule and event.
     private void process(Item scheduleConfig, DateTime processTimeUtc) throws IOException {
         // Get schedule config.
         String scheduleId = scheduleConfig.getString(CONFIG_KEY_SCHEDULE_ID);
