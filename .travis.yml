@@ -19,6 +19,6 @@ deploy:
   memory_size: 384
   runtime: java8
   timeout: 20
-  zip-file: target/BridgeMasterScheduler-1.0.jar
+  zip: target/BridgeMasterScheduler-1.0.jar
   on:
     all_branches: true
