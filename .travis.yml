@@ -15,7 +15,8 @@ deploy:
     develop: arn:aws:iam::649232250620:role/Master-Scheduler-dev
     uat: arn:aws:iam::649232250620:role/Master-Scheduler-uat
     prod: arn:aws:iam::649232250620:role/Master-Scheduler-prod
-  handler_name: org.sagebionetworks.bridge.scheduler.SchedulerLauncher::launch
+  module_name: org.sagebionetworks.bridge.scheduler
+  handler_name: SchedulerLauncher::launch
   memory_size: 384
   runtime: java8
   timeout: 20
