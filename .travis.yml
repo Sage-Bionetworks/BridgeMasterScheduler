@@ -16,6 +16,9 @@ deploy:
     uat: arn:aws:iam::649232250620:role/Master-Scheduler-uat
     prod: arn:aws:iam::649232250620:role/Master-Scheduler-prod
   handler_name: org.sagebionetworks.bridge.scheduler.SchedulerLauncher::launch
+  memory_size: 384
+  runtime: java8
+  timeout: 20
   zip-file: target/BridgeMasterScheduler-1.0.jar
   on:
     all_branches: true
