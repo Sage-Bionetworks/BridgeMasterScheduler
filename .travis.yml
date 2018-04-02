@@ -2,7 +2,14 @@ language: java
 jdk:
 - oraclejdk8
 sudo: false
-before_deploy: mvn clean verify
+before_deploy:
+- mvn clean verify
+- mkdir lambda
+- mv target/BridgeMasterScheduler-1.0.jar lambda
+- cd lambda
+- jar xf BridgeMasterScheduler-1.0.jar
+- rm BridgeMasterScheduler-1.0.jar
+- cd ..
 deploy:
   skip_cleanup: true
   provider: lambda
@@ -20,6 +27,6 @@ deploy:
   memory_size: 384
   runtime: java8
   timeout: 20
-  zip: target/BridgeMasterScheduler-1.0.jar
+  zip: lambda
   on:
     all_branches: true
