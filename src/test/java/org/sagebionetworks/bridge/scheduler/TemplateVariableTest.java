@@ -47,6 +47,12 @@ public class TemplateVariableTest {
     }
 
     @Test
+    public void todaysDate() {
+        String output = TemplateVariable.TODAYS_DATE.resolve("${todaysDate}", PROCESS_TIME_UTC);
+        assertEquals(output, "2018-03-27");
+    }
+
+    @Test
     public void yesterdaysDate() {
         String output = TemplateVariable.YESTERDAYS_DATE.resolve("${yesterdaysDate}", PROCESS_TIME_UTC);
         assertEquals(output, "2018-03-26");

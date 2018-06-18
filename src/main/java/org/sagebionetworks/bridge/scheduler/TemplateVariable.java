@@ -65,6 +65,14 @@ public enum TemplateVariable {
         }
     },
 
+    /** Today's date (as a calendar date rather than as a timestamp). Example: 2018-03-21. */
+    TODAYS_DATE("todaysDate") {
+        @Override
+        protected String getReplacementValue(DateTime processTimeLocal) {
+            return processTimeLocal.toLocalDate().toString();
+        }
+    },
+
     /** Yesterday's date (as a calendar date rather than as a timestamp). Example: 2018-03-20. */
     YESTERDAYS_DATE("yesterdaysDate") {
         @Override
