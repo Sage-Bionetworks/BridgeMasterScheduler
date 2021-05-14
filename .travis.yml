@@ -19,8 +19,8 @@ deploy:
     uat: Master-Scheduler-uat
     prod: Master-Scheduler-prod
   role:
-    develop: arn:aws:iam::649232250620:role/Master-Scheduler-dev
-    uat: arn:aws:iam::649232250620:role/Master-Scheduler-uat
+    develop: arn:aws:iam::420786776710:role/Master-Scheduler-dev
+    uat: arn:aws:iam::420786776710:role/Master-Scheduler-uat
     prod: arn:aws:iam::649232250620:role/Master-Scheduler-prod
   module_name: org.sagebionetworks.bridge.scheduler
   handler_name: SchedulerLauncher::launch
